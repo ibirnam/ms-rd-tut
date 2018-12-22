@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
 
@@ -22,6 +23,7 @@ require('./data/reddit-db')
 // Require the models and controllers
 require('./controllers/posts')(app);
 require('./controllers/comments.js')(app);
+require('./controllers/auth.js')(app);
 
 app.get('/', (req, res) => {
   res.render('home')
