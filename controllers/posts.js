@@ -4,12 +4,13 @@ module.exports = function(app) {
 
     // INDEX
     app.get('/', (req, res) => {
-        res.render('home', {});
-        // Posts.find().then(reviews => {
-        //     res.render('posts-index', { reviews: reviews });
-        // }).catch(err => {
-        //     console.log(err);
-        // })
+        // res.render('home', {});
+        Post.find().then(posts => {
+            res.render('posts-index', { posts });
+            // res.render('home', {});
+        }).catch(err => {
+            console.log(err.message);
+        })
     })
     
     // NEW
@@ -28,4 +29,16 @@ module.exports = function(app) {
           return res.redirect(`/`);
         })
     });
+
+    // SHOW
+    app.get("/posts/:id", function(req, res) {
+        // LOOK UP THE POST
+        Post.findById(req.params.id)
+          .then(post => {
+            res.render("posts-show", { post });
+          })
+          .catch(err => {
+            console.log(err.message);
+          });
+      });
 }
