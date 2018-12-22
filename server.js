@@ -21,6 +21,7 @@ require('./data/reddit-db')
 
 // Require the models and controllers
 require('./controllers/posts')(app);
+require('./controllers/comments.js')(app);
 
 app.get('/', (req, res) => {
   res.render('home')
