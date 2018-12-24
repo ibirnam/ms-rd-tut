@@ -7,6 +7,11 @@ var exphbs = require('express-handlebars');
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
+var cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+
+app.use(cookieParser()); // Add this after you initialize express.
+
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 // The following line must appear AFTER const app = express() and before your routes!

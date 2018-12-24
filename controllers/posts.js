@@ -5,6 +5,7 @@ module.exports = function(app) {
     // INDEX
     app.get('/', (req, res) => {
         // res.render('home', {});
+        console.log(req.cookies);
         Post.find().then(posts => {
             res.render('posts-index', { posts });
             // res.render('home', {});
