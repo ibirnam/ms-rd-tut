@@ -6,7 +6,7 @@ module.exports = function (app) {
     app.post("/posts/:postId/comments", function (req, res) {
         // INSTANTIATE INSTANCE OF MODEL
         const comment = new Comment(req.body);
-
+        comment.author = req.user._id;
         // SAVE INSTANCE OF Comment MODEL TO DB
         comment
             .save()
@@ -18,7 +18,7 @@ module.exports = function (app) {
                 return post.save();
             })
             .then(post => {
-                res.redirect(`/`);
+                res.redirect("/posts/" + post._id);
             })
             .catch(err => {
                 console.log(err);
