@@ -36,6 +36,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Add after body parser initialization!
 app.use(expressValidator());
 
+app.use(express.static('public'));
+
 // Set db
 require('./data/reddit-db')
 
@@ -52,4 +54,5 @@ app.listen(3000, () => {
   console.log('App listening on port 3000!')
 })
 
+// Export the app to be used for auth testing
 module.exports = app;
