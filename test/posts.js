@@ -15,31 +15,31 @@ const samplePost = {
 
 describe("Posts", () => {
 
-    after(() => {
-        Post.deleteMany({title: 'post title'}).exec((err, posts) => {
-          console.log(posts)
-          posts.remove();
-        })
-    });
+    // after(() => {
+    //     Post.deleteMany({title: 'post title'}).exec((err, posts) => {
+    //       console.log(posts)
+    //       posts.remove();
+    //     })
+    // });
 
-    it("should create with valid attributes at POST /posts", (done) => {
-        chai.request("localhost:3000")
-        .post("/posts/new")
-        .send(samplePost)
-        .end((err, res) => {
-            res.status.should.be.equal(200);
-            res.status.should.be.html
-            done();
-        });
-        // .then(res => {
-        //   Post.find(function(err, posts) {
-        //     postCount.should.be.equal(posts.length - 1);
-        //     res.should.have.status(200);
-        //     return done();
-        //   });
-        // })
-        // .catch(err => {
-        //   return done(err);
-        // });
-    });
+    // it("should create with valid attributes at POST /posts", (done) => {
+    //     chai.request("localhost:3000")
+    //     .post("/posts/new")
+    //     .send(samplePost)
+    //     .end((err, res) => {
+    //         res.status.should.be.equal(200);
+    //         res.status.should.be.html
+    //         done();
+    //     })
+    //     .then(res => {
+    //       Post.find(function(err, posts) {
+    //         postCount.should.be.equal(posts.length - 1);
+    //         res.should.have.status(200);
+    //         return done();
+    //       });
+    //     })
+    //     .catch(err => {
+    //       return done(err);
+    //     });
+    // });
 });
