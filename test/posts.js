@@ -1,45 +1,43 @@
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const should = chai.should();
-// const server = require('../server');
-
-chai.use(chaiHttp);
+// test/posts.js
+const chai = require('chai');
+const chaiHttp = require('chai-http');
 
 // Import the Post model from our models folder so we
 // we can use it in our tests.
-const Post = require("../models/post");
+const Post = require('../models/post');
+const server = require('../server');
 
-const samplePost = {
-    "title": "post title", "url": "https://www.google.com", "summary": "post summary"
-}
+chai.should();
+chai.use(chaiHttp);
 
-describe("Posts", () => {
+describe('Posts', () => {
+    const agent = chai.request.agent(server);
+    // Post that we'll use for testing purposes
+    const post = {
+        title: 'post title',
+        url: 'https://www.google.com',
+        summary: 'post summary'
+    };
 
-    after(() => {
-        Post.deleteMany({title: 'post title'}).exec((err, posts) => {
-          console.log(posts)
-          posts.remove();
-        })
+    it("should create with valid attributes at POST /posts", async() => {
+        const originalCount = await Post.countDocuments();
+        const res = await agent.post('/posts/new').send(post);
+        const newCount = await Post.countDocuments();
+        console.log("newCount");
+        console.log(newCount);
+        console.log("newCount-1");
+        console.log(newCount-1);
+        console.log("originalCount");
+        console.log(originalCount);
+        res.should.be.html;
+        res.should.have.status(200);
+        originalCount.should.equal(newCount-1);
+        // expect(originalCount).to.equal(newCount-1);
+
+        await Post.findOneAndDelete(post);
     });
 
-    it("should create with valid attributes at POST /posts", (done) => {
-        chai.request("localhost:3000")
-        .post("/posts/new")
-        .send(samplePost)
-        .end((err, res) => {
-            res.status.should.be.equal(200);
-            res.status.should.be.html
-            done();
-        });
-        // .then(res => {
-        //   Post.find(function(err, posts) {
-        //     postCount.should.be.equal(posts.length - 1);
-        //     res.should.have.status(200);
-        //     return done();
-        //   });
-        // })
-        // .catch(err => {
-        //   return done(err);
-        // });
+    after(() => {
+        agent.close();
     });
 });
