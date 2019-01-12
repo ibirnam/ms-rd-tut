@@ -11,11 +11,24 @@ module.exports = function (app) {
         comment
             .save()
             .then(comment => {
-                return Post.findById(req.params.postId);
+                // return Post.findById(req.params.postId);
+                return Promise.all([
+                    Post.findById(req.params.postId),
+                    // User.findById(req.user._id)
+                ]);
             })
-            .then(post => {
+            // .then(post => {
+            //     post.comments.unshift(comment);
+            //     return post.save();
+            // })
+            .then(([post, user]) => {
                 post.comments.unshift(comment);
-                return post.save();
+                // user.comments.unshift(comment);
+
+                return Promise.all([
+                    post.save(),
+                    // user.save()
+                ]);
             })
             .then(post => {
                 res.redirect("/posts/" + post._id);
