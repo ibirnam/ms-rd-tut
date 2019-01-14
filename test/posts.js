@@ -1,79 +1,53 @@
-// test/posts.js
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const expect = require('chai').expect;
+const app = require("./../server");
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const expect = chai.expect;
+const Post = require("../models/post");
 
-// Import the Post model from our models folder so we
-// we can use it in our tests.
-const Post = require('../models/post');
-const server = require('../server');
-
-chai.should();
 chai.use(chaiHttp);
 
-describe('Posts', function () {
-    let post;
-    const agent = chai.request.agent(server);
+describe("Posts", function () {
+    const newPost = {
+        title: "post title",
+        url: "https://www.google.com",
+        summary: "post summary"
+    };
 
-    before(function () {
-        post = { title: "post title", url: "https://www.google.com", summary: "post summary" };
-    });
-
-    it("should create with valid attributes at POST /posts", function (done) {
-
-        // Post.findOneAndRemove(post, function () {
-        Post.find(function (err, posts) {
-            var postCount = posts.length;
-            console.log("postCount", postCount);
-            agent
-                .post("/posts/new")
-                .send(post)
-                .then(res => {
-                    Post.find(function (err, morePosts) {
-                        console.log("postCount NEW length", postCount.length);
-                        expect(postCount).to.equal(postCount + 1);
-                        res.should.have.status(200);
-                        return done();
+    it('Should create with valid attributes at POST /posts/new', function(done) {
+        // Checks how many posts there are now
+        Post.estimatedDocumentCount()
+            .then(function (initialDocCount) {
+                chai
+                    .request(app)
+                    .post("/posts/new")
+                    // This line fakes a form post,
+                    // since we're not actually filling out a form
+                    .set("content-type", "application/x-www-form-urlencoded")
+                    // Make a request to create another
+                    .send(newPost)
+                    .then(function (res) {
+                        Post.estimatedDocumentCount()
+                            .then(function (newDocCount) {
+                                // Check that the database has one more post in it
+                                expect(res).to.have.status(200);
+                                // Check that the database has one more post in it
+                                expect(newDocCount).to.be.equal(initialDocCount + 1)
+                                done();
+                            })
+                            .catch(function (err) {
+                                done(err);
+                            });
+                    })
+                    .catch(function (err) {
+                        done(err);
                     });
-                })
-                .catch(err => {
-                    return done(err);
-                });
-        });
-        // });
+            })
+            .catch(function (err) {
+                done(err);
+            });
     });
 
     after(function () {
-        Post.findOneAndDelete(post);
-        agent.close();
+        Post.findOneAndDelete(newPost);
     });
-    // const agent = chai.request.agent(server);
-    // // Post that we'll use for testing purposes
-    // const post = {
-    //     title: 'post title',
-    //     url: 'https://www.google.com',
-    //     summary: 'post summary'
-    // };
-
-    // it("should create with valid attributes at POST /posts", function(done) {
-    //     const originalCount =  Post.estimatedDocumentCount();
-    //     console.log("originalCount ", originalCount);
-    //     agent.post('/posts/new').send(post)
-    //         .then(function(res)  {
-    //             res.should.be.html;
-    //             res.should.have.status(200);
-    //             originalCount.should.equal(originalCount + 1);
-    //             return done();
-    //         })
-    //         .catch(function(err)  {
-    //             return done(err);
-    //         });
-    //     // res.should.be.html;
-    //     // res.should.have.status(200);
-    // });
-
-    // after(function() {
-    //     Post.findOneAndDelete(post);
-    //     agent.close();
-    // });
 });
