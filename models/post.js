@@ -9,8 +9,7 @@ const PostSchema = new Schema({
   url: { type: String, required: true },
   summary: { type: String, required: true },
   subreddit: { type: String, required: true },
-  // comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-  comments: [Comment.schema],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   author : { type: Schema.Types.ObjectId, ref: "User", required: true },
   upVotes : [{ type: Schema.Types.ObjectId, ref: "User"}],
   downVotes : [{ type: Schema.Types.ObjectId, ref: "User"}],
@@ -18,7 +17,7 @@ const PostSchema = new Schema({
 });
 
 PostSchema
-    .pre('findOne', Populate('author'))
-    .pre('find', Populate('author'))
+.pre('findOne', Populate('author'))
+.pre('find', Populate('author'))
 
 module.exports = mongoose.model("Post", PostSchema);
