@@ -10,7 +10,7 @@ var User = require("../models/user");
 
 describe("User", function () {
     // bad login
-    it("should not be able to login if they have not registered", done => {
+    it("should not be able to login if they have not registered", function(done) {
         agent.post("/login", { email: "wrong@wrong.com", password: "nope" }).end(function (err, res) {
             res.status.should.be.equal(401);
             done();
@@ -18,7 +18,7 @@ describe("User", function () {
     });
 
     // signup
-    it("should be able to signup", done => {
+    it("should be able to signup", function(done) {
         User.findOneAndRemove({ username: "testone" }, function () {
             agent
                 .post("/sign-up")
@@ -33,7 +33,7 @@ describe("User", function () {
     });
 
     // logout
-    it("should be able to logout", done => {
+    it("should be able to logout", function(done) {
         agent.get("/logout").end(function (err, res) {
             res.should.have.status(200);
             agent.should.not.have.cookie("nToken");
@@ -42,7 +42,7 @@ describe("User", function () {
     });
 
     // login
-    it("should be able to login", done => {
+    it("should be able to login", function(done) {
         agent
             .post("/login")
             .send({ username: "testone", password: "password" })
@@ -51,5 +51,9 @@ describe("User", function () {
                 agent.should.have.cookie("nToken");
                 done();
             });
+    });
+
+    after(function () {
+        agent.close()
     });
 });
