@@ -1,45 +1,91 @@
+const app = require("./../server");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const should = chai.should();
-// const server = require('../server');
+const expect = chai.expect;
+const Post = require("../models/post");
+const User = require('../models/user')
 
 chai.use(chaiHttp);
 
-// Import the Post model from our models folder so we
-// we can use it in our tests.
-const Post = require("../models/post");
+const agent = chai.request.agent(app);
 
-const samplePost = {
-    "title": "post title", "url": "https://www.google.com", "summary": "post summary"
-}
+describe("Posts", function () {
+    const newPost = {
+        title: "post title",
+        url: "https://www.google.com",
+        summary: "post summary",
+        subreddit: "test"
+    };
 
-describe("Posts", () => {
+    const user = {
+        username: 'poststest',
+        password: 'testposts'
+    };
 
-    // after(() => {
-    //     Post.deleteMany({title: 'post title'}).exec((err, posts) => {
-    //       console.log(posts)
-    //       posts.remove();
-    //     })
-    // });
+    before(function (done) {
+        agent
+            .post('/sign-up')
+            .set("content-type", "application/x-www-form-urlencoded")
+            .send(user)
+            .then(function (res) {
+                done();
+            })
+            .catch(function (err) {
+                done(err);
+            });
+    });
 
-    // it("should create with valid attributes at POST /posts", (done) => {
-    //     chai.request("localhost:3000")
-    //     .post("/posts/new")
-    //     .send(samplePost)
-    //     .end((err, res) => {
-    //         res.status.should.be.equal(200);
-    //         res.status.should.be.html
-    //         done();
-    //     })
-    //     .then(res => {
-    //       Post.find(function(err, posts) {
-    //         postCount.should.be.equal(posts.length - 1);
-    //         res.should.have.status(200);
-    //         return done();
-    //       });
-    //     })
-    //     .catch(err => {
-    //       return done(err);
-    //     });
-    // });
+    it('Should create with valid attributes at POST /posts/new', function (done) {
+        // Checks how many posts there are now
+        Post.estimatedDocumentCount()
+            .then(function (initialDocCount) {
+                agent
+                    .post("/posts/new")
+                    // This line fakes a form post,
+                    // since we're not actually filling out a form
+                    .set("content-type", "application/x-www-form-urlencoded")
+                    // Make a request to create another
+                    .send(newPost)
+                    .then(function (res) {
+                        Post.estimatedDocumentCount()
+                            .then(function (newDocCount) {
+                                console.log("made it to check status");
+                                // Check that the database has one more post in it
+                                expect(res).to.have.status(200);
+                                // Check that the database has one more post in it
+                                expect(newDocCount).to.be.equal(initialDocCount + 1)
+                                done();
+                            })
+                            .catch(function (err) {
+                                done(err);
+                            });
+                    })
+                    .catch(function (err) {
+                        done(err);
+                    });
+            })
+            .catch(function (err) {
+                done(err);
+            });
+    });
+
+    after(function (done) {
+        Post.findOneAndDelete(newPost)
+            .then(function (res) {
+                agent.close()
+
+                User.findOneAndDelete({
+                    username: user.username
+                })
+                    .then(function (res) {
+                        done()
+                    })
+                    .catch(function (err) {
+                        done(err);
+                    });
+            })
+            .catch(function (err) {
+                done(err);
+            });
+    });
 });
